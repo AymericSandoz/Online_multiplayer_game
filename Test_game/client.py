@@ -1,8 +1,6 @@
 import pygame
 from network import Network
 from player import Player
-from screen import Screen
-from map import Map
 
 width = 700
 height = 700
