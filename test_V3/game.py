@@ -4,7 +4,8 @@ from map import Map
 from player import Player, OtherPlayers
 from screen import Screen
 from network import Network
-from entities import player_instances
+from entities import player_instances, initial_X_Position, initial_Y_Position
+
 
 class Game:
     def __init__(self):
@@ -12,7 +13,7 @@ class Game:
         self.screen: Screen = Screen()
         self.map: Map = Map(self.screen)
         self.keylistener: KeyListener = KeyListener()
-        self.player: Player = Player(self.keylistener, self.screen, 100, 100)
+        self.player: Player = Player(self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
         self.players = []
         self.map.add_player(self.player)
         self.map.add_squares(player_instances)
@@ -24,12 +25,9 @@ class Game:
         clock = pygame.time.Clock()
 
         while self.running:
+            # self.map.test_print()
             clock.tick(60)
             other_players = n.send(OtherPlayers(self.player.position.x, self.player.position.y))  # Envoyez une requête pour obtenir la liste des joueurs du serveur
-
-            for player in other_players:
-
-                print(player.x, player.y)
 
             self.handle_input()
             # self.map.move_squares(other_players)

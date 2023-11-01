@@ -6,11 +6,8 @@ players_start = [
     {"x": 300, "y": 300},
     {"x": 400, "y": 400},
     {"x": 500, "y": 500},
-    {"x": 600, "y": 600},
-    # {"x": 700, "y": 700},
-    # {"x": 800, "y": 800},
-    # {"x": 900, "y": 900},
-    # {"x": 1000, "y": 1000}
+    {"x": 800, "y": 700},
+    {"x": 1500, "y": 500},
 ]
 
 # Créez des instances de la classe Player à partir de la liste de dictionnaires
@@ -21,8 +18,8 @@ for player_data in players_start:
     player_instance = OtherPlayers(x, y)
     player_instances.append(player_instance)
 
-for player in player_instances:
-    print(player.x, player.y)
-
 MAX_PLAYERS = 10
 
+initial_X_Position = 100
+
+initial_Y_Position = 100
