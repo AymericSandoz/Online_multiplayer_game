@@ -1,6 +1,7 @@
 import pygame
 from keylistener import KeyListener
 from map import Map
+from screen import Screen
 from player import Player, OtherPlayers
 from screen import Screen
 from network import Network
@@ -13,8 +14,7 @@ class Game:
         self.screen: Screen = Screen()
         self.map: Map = Map(self.screen)
         self.keylistener: KeyListener = KeyListener()
-        self.player: Player = Player(
-            self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
+        self.player: Player = Player(self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
         self.players = []
         self.map.add_player(self.player)
         self.map.add_squares(player_instances)
@@ -45,12 +45,3 @@ class Game:
                 self.keylistener.add_key(event.key)
             elif event.type == pygame.KEYUP:
                 self.keylistener.remove_key(event.key)
-
-    # def update_others_players(self, other_players):
-    #     for player in other_players:
-    #         x = player.x  # Remplacez par l'attribut correct contenant la position X
-    #         y = player.y  # Remplacez par l'attribut correct contenant la position Y
-
-    #         # Dessinez un carré à la position x, y
-    #         pygame.draw.rect(self.screen.get_display(), (255, 0, 0), (x, y, 20, 20))  # Utilisez la couleur et la taille de carré appropriées
-    #     pygame.display.update()
