@@ -15,7 +15,7 @@ player_instances = []
 for player_data in players_start:
     x = player_data["x"]
     y = player_data["y"]
-    player_instance = OtherPlayers(x, y)
+    player_instance = OtherPlayers(x, y, "down", 0, 1)
     player_instances.append(player_instance)
 
 MAX_PLAYERS = 10

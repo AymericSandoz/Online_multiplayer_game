@@ -32,7 +32,7 @@ class Game:
             clock.tick(60)
             # Envoyez une requête pour obtenir la liste des joueurs du serveur
             other_players = n.send(OtherPlayers(
-                self.player.position.x, self.player.position.y))
+                self.player.position.x, self.player.position.y, self.player.direction, self.player.step, self.player.speed, self.player.image))
 
             self.handle_input()
             # self.map.move_squares(other_players)

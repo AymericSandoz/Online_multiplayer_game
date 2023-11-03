@@ -130,7 +130,8 @@ class Map:
         for data in character_data:
             screen_x = (data.x - camera_x) * self.map_layer.zoom
             screen_y = (data.y - camera_y) * self.map_layer.zoom
-            character = OtherPlayersVisualisation(screen_x, screen_y)
+            character = OtherPlayersVisualisation(
+                screen_x, screen_y, data.direction, data.step, data.speed)
             self.character_sprites.add(character)
 
     def move_characters(self, character_data):
@@ -148,7 +149,9 @@ class Map:
         for character, data in zip(self.character_sprites, character_data):
             character.rect.x = (data.x - camera_x) * self.map_layer.zoom
             character.rect.y = (data.y - camera_y) * self.map_layer.zoom
-            print("character.rect", character.rect)
+            character.direction = data.direction
+            character.step = data.step
+            character.speed = data.speed
 
     def update(self) -> None:
         if self.player:
@@ -159,7 +162,7 @@ class Map:
         self.group.center(self.player.rect.center)
         self.group.draw(self.screen.get_display())
         # self.squares.draw(self.screen.get_display())
-        # self.character_sprites.update()
+        self.character_sprites.update()
         self.character_sprites.draw(self.screen.get_display())
 
     def pose_player(self, switch: Switch):

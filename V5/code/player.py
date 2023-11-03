@@ -80,7 +80,7 @@ class Player(Entity):
 
     def switch_bike(self, deactive=False):
         if self.speed == 1 and not deactive:
-            self.speed = 2
+            self.speed = 3
             self.all_images = self.get_all_images(self.spritesheet_bike)
         else:
             self.speed = 1
@@ -89,9 +89,12 @@ class Player(Entity):
 
 
 class OtherPlayers():
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, direction: KeyListener, speed: int, step: int):
         self.x = x
         self.y = y
+        self.direction = direction
+        self.speed = speed
+        self.step = step
 
     def __iter__(self):
         yield self.x
@@ -99,13 +102,15 @@ class OtherPlayers():
 
 
 class OtherPlayersVisualisation(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, direction: str, step: int, speed: int, image_str: str):
         super().__init__()
         # OtherPlayers.__init__(self, x, y)
-        # self.x = x
-        # self.y = y
+        self.x = x
+        self.y = y
         self.spritesheet = pygame.image.load(
             "./assets/sprite/hero_01_red_m_walk.png")
+        self.spritesheet_bike: pygame.image = pygame.image.load(
+            "./assets/sprite/hero_01_red_m_cycle_roll.png")
         self.image = Tool.split_image(self.spritesheet, 0, 0, 24, 32)
         self.position = pygame.math.Vector2(x, y)
         self.rect = self.image.get_rect()
@@ -114,16 +119,17 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         self.image_part = 0
         self.reset_animation = False
         self.hitbox = pygame.Rect(0, 0, 16, 16)
-        print(self.position)
+        self.image_test: pygame.image = Tool.split_image(pygame.image.load(
+            image_str), 0, 0, 24, 32)
 
-        self.step: int = 0
+        self.step: int = step
         self.animation_walk: bool = False
-        self.direction: str = "down"
+        self.direction: str = direction
 
         self.animtion_step_time: float = 0.0
         self.action_animation: int = 16
 
-        self.speed: int = 1
+        self.speed: int = speed
 
         # self.rect = pygame.Rect(x, y, 20, 20)
         # self.image = pygame.Surface((20, 20))
@@ -136,9 +142,19 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
     def update(self) -> None:
         self.animation_sprite()
         # self.move()
-        self.rect.center = self.position
-        self.hitbox.midbottom = self.rect.midbottom
+        # self.rect.center = self.position
+        # self.hitbox.midbottom = self.rect.midbottom
+        # self.check_direction()
+        self.switch_bike()
         self.image = self.all_images[self.direction][self.index_image]
+
+        # self.check_move()
+        # self.position = pygame.math.Vector2(self.x, self.y)
+        super().update()
+
+    # def check_direction(self, direction) -> None:
+    #     if self.animation_walk is False:
+    #         self.direction = direction
 
     def move_left(self) -> None:
         self.animation_walk = True
@@ -187,17 +203,25 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
     #                 else:
     #                     self.image_part = 0
 
-    def align_hitbox(self) -> None:
-        self.position.x += 16
-        self.rect.center = self.position
-        self.hitbox.midbottom = self.rect.midbottom
-        while self.hitbox.x % 16 != 0:
-            self.rect.x -= 1
-            self.hitbox.midbottom = self.rect.midbottom
-        while self.hitbox.y % 16 != 0:
-            self.rect.y -= 1
-            self.hitbox.midbottom = self.rect.midbottom
-        self.position = pygame.math.Vector2(self.rect.center)
+    # def align_hitbox(self) -> None:
+    #     self.position.x += 16
+    #     self.rect.center = self.position
+    #     self.hitbox.midbottom = self.rect.midbottom
+    #     while self.hitbox.x % 16 != 0:
+    #         self.rect.x -= 1
+    #         self.hitbox.midbottom = self.rect.midbottom
+    #     while self.hitbox.y % 16 != 0:
+    #         self.rect.y -= 1
+    #         self.hitbox.midbottom = self.rect.midbottom
+    #     self.position = pygame.math.Vector2(self.rect.center)
+
+    def switch_bike(self, deactive=False):
+        if self.speed == 1 and not deactive:
+            self.speed = 3
+            self.all_images = self.get_all_images(self.spritesheet_bike)
+        else:
+            self.speed = 1
+            self.all_images = self.get_all_images(self.spritesheet)
 
     def get_all_images(self, spritesheet) -> dict[str, list[pygame.image]]:
         all_images = {
