@@ -2,7 +2,7 @@ import pygame
 import pyscroll
 import pytmx
 
-from player import Player
+from player import Player, OtherPlayers, OtherPlayersVisualisation
 from screen import Screen
 from switch import Switch
 
@@ -21,6 +21,7 @@ class Map:
         self.collisions: list[pygame.Rect] | None = None
 
         self.squares = pygame.sprite.Group()
+        self.character_sprites = pygame.sprite.Group()
 
         self.current_map: Switch = Switch(
             "switch", "map_0", pygame.Rect(0, 0, 0, 0), 0)
@@ -82,9 +83,9 @@ class Map:
         screen_width, screen_heigth = self.screen.get_size()
         screen_width = screen_width / self.map_layer.zoom
         screen_heigth = screen_heigth / self.map_layer.zoom
-        screen_topleft_coordinates_x, screen_topleft_coordinates_y = self.group.view.topleft
+        # screen_topleft_coordinates_x, screen_topleft_coordinates_y = self.group.view.topleft
         map_width, map_heigth = self.map_layer.map_rect.size
-        center_x, center_y = self.group.view.center
+        # center_x, center_y = self.group.view.center
         camera_x = self.player.rect.x - (screen_width / 2)
         camera_y = self.player.rect.y - (screen_heigth / 2)
 
@@ -102,9 +103,9 @@ class Map:
         screen_width, screen_heigth = self.screen.get_size()
         screen_width = screen_width / self.map_layer.zoom
         screen_heigth = screen_heigth / self.map_layer.zoom
-        screen_topleft_coordinates_x, screen_topleft_coordinates_y = self.group.view.topleft
+        # screen_topleft_coordinates_x, screen_topleft_coordinates_y = self.group.view.topleft
         map_width, map_heigth = self.map_layer.map_rect.size
-        center_x, center_y = self.group.view.center
+        # center_x, center_y = self.group.view.center
         camera_x = self.player.rect.x - (screen_width / 2)
         camera_y = self.player.rect.y - (screen_heigth / 2)
 
@@ -115,6 +116,40 @@ class Map:
             square.rect.x = (player.x - camera_x) * self.map_layer.zoom
             square.rect.y = (player.y - camera_y) * self.map_layer.zoom
 
+    def add_characters(self, character_data):
+        screen_width, screen_heigth = self.screen.get_size()
+        screen_width = screen_width / self.map_layer.zoom
+        screen_heigth = screen_heigth / self.map_layer.zoom
+        map_width, map_heigth = self.map_layer.map_rect.size
+        camera_x = self.player.rect.x - (screen_width / 2)
+        camera_y = self.player.rect.y - (screen_heigth / 2)
+
+        # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
+        camera_x = max(0, min(camera_x, map_width - screen_width))
+        camera_y = max(0, min(camera_y, map_heigth - screen_heigth))
+        for data in character_data:
+            screen_x = (data.x - camera_x) * self.map_layer.zoom
+            screen_y = (data.y - camera_y) * self.map_layer.zoom
+            character = OtherPlayersVisualisation(screen_x, screen_y)
+            self.character_sprites.add(character)
+
+    def move_characters(self, character_data):
+        screen_width, screen_heigth = self.screen.get_size()
+        screen_width = screen_width / self.map_layer.zoom
+        screen_heigth = screen_heigth / self.map_layer.zoom
+        map_width, map_heigth = self.map_layer.map_rect.size
+        camera_x = self.player.rect.x - (screen_width / 2)
+        camera_y = self.player.rect.y - (screen_heigth / 2)
+
+        # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
+        camera_x = max(0, min(camera_x, map_width - screen_width))
+        camera_y = max(0, min(camera_y, map_heigth - screen_heigth))
+
+        for character, data in zip(self.character_sprites, character_data):
+            character.rect.x = (data.x - camera_x) * self.map_layer.zoom
+            character.rect.y = (data.y - camera_y) * self.map_layer.zoom
+            print("character.rect", character.rect)
+
     def update(self) -> None:
         if self.player:
             if self.player.change_map and self.player.step >= 8:
@@ -123,7 +158,9 @@ class Map:
         self.group.update()
         self.group.center(self.player.rect.center)
         self.group.draw(self.screen.get_display())
-        self.squares.draw(self.screen.get_display())
+        # self.squares.draw(self.screen.get_display())
+        # self.character_sprites.update()
+        self.character_sprites.draw(self.screen.get_display())
 
     def pose_player(self, switch: Switch):
         position = self.tmx_data.get_object_by_name(

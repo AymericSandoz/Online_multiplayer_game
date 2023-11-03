@@ -20,6 +20,6 @@ for player_data in players_start:
 
 MAX_PLAYERS = 10
 
-initial_X_Position = 500
+initial_X_Position = 1500
 
 initial_Y_Position = 300

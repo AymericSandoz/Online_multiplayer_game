@@ -3,7 +3,7 @@ from _thread import *
 import pickle
 from entities import player_instances
 
-server = "192.168.1.74"
+server = "192.168.1.44"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,6 +18,7 @@ print("Waiting for a connection, Server Started")
 
 players = player_instances
 
+
 def threaded_client(conn, player):
     conn.send(pickle.dumps(players[player]))
     reply = ""
@@ -31,12 +32,14 @@ def threaded_client(conn, player):
                 break
             else:
                 reply = players[:player] + players[player+1:]
-            conn.sendall(pickle.dumps(reply))  # replay jusqua présent mais marche aussi avec players
+            # replay jusqua présent mais marche aussi avec players
+            conn.sendall(pickle.dumps(reply))
         except:
             break
 
     print("Lost connection")
     conn.close()
+
 
 currentPlayer = 0
 while True:

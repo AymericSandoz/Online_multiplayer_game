@@ -14,10 +14,12 @@ class Game:
         self.screen: Screen = Screen()
         self.map: Map = Map(self.screen)
         self.keylistener: KeyListener = KeyListener()
-        self.player: Player = Player(self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
+        self.player: Player = Player(
+            self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
         self.players = []
         self.map.add_player(self.player)
-        self.map.add_squares(player_instances)
+        # self.map.add_squares(player_instances)
+        self.map.add_characters(player_instances)
 
     def run(self):
         n = Network()
@@ -33,7 +35,8 @@ class Game:
                 self.player.position.x, self.player.position.y))
 
             self.handle_input()
-            self.map.move_squares(other_players)
+            # self.map.move_squares(other_players)
+            self.map.move_characters(other_players)
             self.map.update()
             self.screen.update()
 
