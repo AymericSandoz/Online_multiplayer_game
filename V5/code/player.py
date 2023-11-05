@@ -89,12 +89,13 @@ class Player(Entity):
 
 
 class OtherPlayers():
-    def __init__(self, x: int, y: int, direction: KeyListener, speed: int, step: int):
+    def __init__(self, x: int, y: int, direction: KeyListener, speed: int, step: int, image_test=None):
         self.x = x
         self.y = y
         self.direction = direction
         self.speed = speed
         self.step = step
+        self.image_test = image_test
 
     def __iter__(self):
         yield self.x
@@ -102,7 +103,7 @@ class OtherPlayers():
 
 
 class OtherPlayersVisualisation(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, direction: str, step: int, speed: int, image_str: str):
+    def __init__(self, x: int, y: int, direction: str, step: int, speed: int, image_test):
         super().__init__()
         # OtherPlayers.__init__(self, x, y)
         self.x = x
@@ -119,8 +120,8 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         self.image_part = 0
         self.reset_animation = False
         self.hitbox = pygame.Rect(0, 0, 16, 16)
-        self.image_test: pygame.image = Tool.split_image(pygame.image.load(
-            image_str), 0, 0, 24, 32)
+        self.image_test: pygame.image = pygame.image.fromstring(
+            image_test, (20, 20), 'RGB')
 
         self.step: int = step
         self.animation_walk: bool = False
@@ -147,6 +148,8 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         # self.check_direction()
         self.switch_bike()
         self.image = self.all_images[self.direction][self.index_image]
+        self.image_test: pygame.image = pygame.image.fromstring(
+            image_test, (20, 20), 'RGB')
 
         # self.check_move()
         # self.position = pygame.math.Vector2(self.x, self.y)

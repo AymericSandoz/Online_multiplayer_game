@@ -131,7 +131,7 @@ class Map:
             screen_x = (data.x - camera_x) * self.map_layer.zoom
             screen_y = (data.y - camera_y) * self.map_layer.zoom
             character = OtherPlayersVisualisation(
-                screen_x, screen_y, data.direction, data.step, data.speed, data.image_test)
+                screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index)
             self.character_sprites.add(character)
 
     def move_characters(self, character_data):
@@ -150,9 +150,8 @@ class Map:
             character.rect.x = (data.x - camera_x) * self.map_layer.zoom
             character.rect.y = (data.y - camera_y) * self.map_layer.zoom
             character.direction = data.direction
-            character.step = data.step
-            character.speed = data.speed
-            character.image_test = data.image
+            character.index_image = data.index_image
+            character.spritesheet_index = data.spritesheet_index
 
     def update(self) -> None:
         if self.player:
