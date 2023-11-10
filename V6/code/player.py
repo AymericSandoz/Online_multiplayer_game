@@ -81,12 +81,14 @@ class Player(Entity):
 
     def switch_bike(self, deactive=False):
         if self.speed == 1 and not deactive:
-            self.speed = 3
+            self.speed = 4  # laiisser un nb paire sinon tout les perso se decalent lol quel enfer
             self.all_images = self.get_all_images(self.spritesheet_bike)
+            # self.align_hitbox()
             self.spritesheet_index = "bike_red"
         else:
             self.speed = 1
             self.all_images = self.get_all_images(self.spritesheet)
+            # self.align_hitbox()
             self.spritesheet_index = "foot_red"
         self.keylistener.remove_key(pygame.K_b)
 
@@ -105,13 +107,14 @@ class OtherPlayers():
 
 
 class OtherPlayersVisualisation(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red"):
+    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red", map_zoom: int = 1):
         super().__init__()
+
         self.x = x
         self.y = y
         self.spritesheet: pygame.image = pygame.image.load(
             "./assets/sprite/hero_01_red_m_walk.png")
-        self.direction: str = "down"
+        self.direction: str = direction
         self.position = pygame.math.Vector2(x, y)
         self.spritesheet_bike: pygame.image = pygame.image.load(
             "./assets/sprite/hero_01_red_m_cycle_roll.png")
@@ -119,6 +122,7 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
             self.spritesheet, 0, 0, 24, 32)
 
         self.rect = self.image.get_rect()
+        # self.resize_image(map_zoom)
         self.index_image: int = 0
         self.all_images: dict[str, list[pygame.image]
                               ] = self.get_all_images(self.spritesheet)
@@ -128,10 +132,9 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         yield self.x
         yield self.y
 
-    def update(self) -> None:
+    def update(self, map_zoom) -> None:
         self.switch_spritesheet()
         self.image = self.all_images[self.direction][self.index_image]
-        super().update()
 
     def get_all_images(self, spritesheet) -> dict[str, list[pygame.image]]:
         all_images = {
@@ -155,3 +158,11 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
             self.all_images = self.get_all_images(self.spritesheet_bike)
         else:
             self.all_images = self.get_all_images(self.spritesheet)
+
+    def resize_image(self, factor):
+        print(self.rect)
+        old_rect = self.rect
+        self.image = pygame.transform.scale(
+            self.image, (24 * factor, 32 * factor))
+        self.rect = self.image.get_rect(topleft=(old_rect.topleft))
+        print(self.rect)

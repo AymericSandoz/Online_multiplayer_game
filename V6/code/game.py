@@ -5,7 +5,6 @@ from screen import Screen
 from player import Player, OtherPlayers
 from screen import Screen
 from network import Network
-from entities import player_instances, initial_X_Position, initial_Y_Position
 
 
 class Game:
@@ -14,28 +13,24 @@ class Game:
         self.screen: Screen = Screen()
         self.map: Map = Map(self.screen)
         self.keylistener: KeyListener = KeyListener()
-        self.player: Player = Player(
-            self.keylistener, self.screen, initial_X_Position, initial_Y_Position)
-        self.players = []
-        self.map.add_player(self.player)
-        # self.map.add_squares(player_instances)
-        self.map.add_characters(player_instances)
+        self.player: Player = None
 
-    def run(self):
+    def run(self, player_instances):
         n = Network()
         p = n.getP()
-
+        self.player = Player(
+            self.keylistener, self.screen, p.x, p.y)
+        self.map.add_player(self.player)
+        # intéressant si je laisse juste players instances il y a u bonhomme en haut à gauche
+        self.map.add_characters(player_instances[0:(len(player_instances)-1)])
         clock = pygame.time.Clock()
 
         while self.running:
-            # self.map.test_print()
             clock.tick(60)
             # Envoyez une requête pour obtenir la liste des joueurs du serveur
             other_players = n.send(OtherPlayers(
                 self.player.position.x, self.player.position.y, self.player.direction, self.player.index_image, self.player.spritesheet_index))
-
             self.handle_input()
-            # self.map.move_squares(other_players)
             self.map.move_characters(other_players)
             self.map.update()
             self.screen.update()

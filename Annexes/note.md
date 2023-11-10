@@ -31,3 +31,16 @@ En résumé, `AF_INET` spécifie le protocole Internet IPv4, et `SOCK_STREAM` sp
 
 
 192.168.1.75
+
+La vitesse du velo doit etre egale à 2 sinon ça crée des bugs d'alignement(hitbox). 4 ça passe mais 3 c'est horrible.  
+Les autres sprite, avant d'être controlés par quelqu'un, ne sont pas paraitement alignés car il ne subissent pas encore self.player.align_hitbox
+
+  reply = players # players[:player] + players[player+1:]
+Le fait de mettre players a régler le soucis de l'affichage du bonhomme en haut à gauche mais à créer un nouveau soucis d'affichage de doublon dans la maison lol wtf
+
+  # intéressant si je laisse juste players instances il y a u bonhomme en haut à gauche
+        self.map.add_characters(player_instances[0:(len(player_instances)-1)])
+
+
+# en y de 368 à 338 il y a un bug les autres perso ne décale
+# e x de 636 à 668
