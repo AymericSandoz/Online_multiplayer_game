@@ -15,6 +15,7 @@ class Map:
         self.group: pyscroll.PyscrollGroup | None = None
 
         self.player: Player | None = None
+        self.characters: list | None = []
         self.switchs: list[Switch] | None = None
         self.collisions: list[pygame.Rect] | None = None
 
@@ -61,6 +62,7 @@ class Map:
             self.player.add_switchs(self.switchs)
             self.player.add_collisions(self.collisions)
             self.group.add(self.player)
+            self.group.add(self.character_sprites)
             if switch.name.split("_")[0] != "map":
                 self.player.switch_bike(True)
 
@@ -75,64 +77,23 @@ class Map:
         self.player.add_collisions(self.collisions)
 
     def add_characters(self, character_data):
-        screen_width, screen_heigth = self.screen.get_size()
-        screen_width = screen_width / self.map_layer.zoom
-        screen_heigth = screen_heigth / self.map_layer.zoom
-        map_width, map_heigth = self.map_layer.map_rect.size
-        camera_x = self.player.rect.x - (screen_width / 2)
-        camera_y = self.player.rect.y - (screen_heigth / 2)
-
-        # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
-        camera_x = max(0, min(camera_x, map_width - screen_width))
-        camera_y = max(0, min(camera_y, map_heigth - screen_heigth))
         for data in character_data:
-            screen_x = (data.x - camera_x -
+            screen_x = (data.x -
                         self.player.rect.width/2) * self.map_layer.zoom
-            screen_y = (data.y - camera_y -
+            screen_y = (data.y -
                         self.player.rect.height/2) * self.map_layer.zoom
             character = OtherPlayersVisualisation(
                 screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index, self.map_layer.zoom)
             self.character_sprites.add(character)
-
-    # def move_characters(self, character_data):
-    #     screen_width, screen_heigth = self.screen.get_size()
-    #     screen_width = screen_width / self.map_layer.zoom
-    #     screen_heigth = screen_heigth / self.map_layer.zoom
-    #     map_width, map_heigth = self.map_layer.map_rect.size
-    #     camera_x = self.player.rect.x - (screen_width / 2)
-    #     camera_y = self.player.rect.y - (screen_heigth / 2)
-
-    #     # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
-    #     camera_x = max(0, min(camera_x, map_width - screen_width))
-    #     camera_y = max(0, min(camera_y, map_heigth - screen_heigth))
-
-    #     for character, data in zip(self.character_sprites, character_data):
-    #         character.rect.x = (data.x - camera_x -
-    #                             self.player.rect.width/2) * self.map_layer.zoom
-    #         character.rect.y = (
-    #             data.y - camera_y - self.player.rect.height/2) * self.map_layer.zoom
-    #         character.direction = data.direction
-    #         character.index_image = data.index_image
-    #         character.spritesheet_index = data.spritesheet_index
+            self.group.add(character)
+            self.characters.append(character)
 
     def move_characters(self, character_data):
-        screen_width, screen_heigth = self.screen.get_size()
-        screen_width = screen_width / self.map_layer.zoom
-        screen_heigth = screen_heigth / self.map_layer.zoom
-        map_width, map_heigth = self.map_layer.map_rect.size
-
-        camera_x = self.player.rect.centerx - (screen_width / 2)
-        camera_y = self.player.rect.centery - (screen_heigth / 2)
-
-        # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
-        camera_x = max(0, min(camera_x, map_width - screen_width))
-        camera_y = max(0, min(camera_y, map_heigth - screen_heigth))
-
         for character, data in zip(self.character_sprites, character_data):
-            character.rect.x = (data.x - camera_x -
+            character.rect.x = (data.x -
                                 self.player.rect.width/2) * self.map_layer.zoom
             character.rect.y = (
-                data.y - camera_y - self.player.rect.height/2) * self.map_layer.zoom
+                data.y - self.player.rect.height/2) * self.map_layer.zoom
             character.direction = data.direction
             character.index_image = data.index_image
             character.spritesheet_index = data.spritesheet_index
@@ -144,9 +105,9 @@ class Map:
                 self.player.change_map = None
         self.group.center(self.player.rect.center)
         self.group.update()
-        self.character_sprites.update(self.map_layer.zoom)
+        # self.character_sprites.update(self.map_layer.zoom)
         self.group.draw(self.screen.get_display())
-        self.character_sprites.draw(self.screen.get_display())
+        # self.character_sprites.draw(self.screen.get_display())
 
     def pose_player(self, switch: Switch):
         position = self.tmx_data.get_object_by_name(
