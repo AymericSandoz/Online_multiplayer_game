@@ -19,7 +19,7 @@ class Player(Entity):
         self.change_map: Switch | None = None
         self.spritesheet_index = "foot_red"
 
-    def update(self) -> None:
+    def update(self, player_current_map_name) -> None:
         self.check_input()
         self.check_move()
         super().update()
@@ -94,12 +94,13 @@ class Player(Entity):
 
 
 class OtherPlayers():
-    def __init__(self, x: int, y: int, direction: str, index_image: int = 0, spritesheet_index: str = "foot_red"):
+    def __init__(self, x: int, y: int, direction: str, index_image: int = 0, spritesheet_index: str = "foot_red", current_map_name: str = "map_0"):
         self.x = x
         self.y = y
         self.direction = direction
         self.index_image = index_image
         self.spritesheet_index = spritesheet_index
+        self.current_map_name = current_map_name
 
     def __iter__(self):
         yield self.x
@@ -107,7 +108,7 @@ class OtherPlayers():
 
 
 class OtherPlayersVisualisation(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red", map_zoom: int = 1):
+    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red", map_zoom: int = 1, current_map_name: str = "map_0"):
         super().__init__()
 
         self.x = x
@@ -127,14 +128,19 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         self.all_images: dict[str, list[pygame.image]
                               ] = self.get_all_images(self.spritesheet)
         self.spritesheet_index: str = "foot_red"
+        self.current_map_name = current_map_name
+        self.visible = True
 
     def __iter__(self):
         yield self.x
         yield self.y
 
-    def update(self) -> None:
+    def update(self, player_current_map_name) -> None:
         self.switch_spritesheet()
         self.image = self.all_images[self.direction][self.index_image]
+
+        self.set_visibility(player_current_map_name)
+        # self.kill()
 
     def get_all_images(self, spritesheet) -> dict[str, list[pygame.image]]:
         all_images = {
@@ -166,3 +172,12 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
             self.image, (24 * factor, 32 * factor))
         self.rect = self.image.get_rect(topleft=(old_rect.topleft))
         print(self.rect)
+
+    # Add a method to toggle visibility
+    def set_visibility(self, player_current_map_name):
+        if player_current_map_name == self.current_map_name:
+            self.visible = True
+        else:
+            self.visible = False
+            self.rect.x = -400
+            self.rect.y = -400

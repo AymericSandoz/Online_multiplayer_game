@@ -18,6 +18,7 @@ class Map:
         self.characters: list | None = []
         self.switchs: list[Switch] | None = None
         self.collisions: list[pygame.Rect] | None = None
+        self.all_sprites = pygame.sprite.Group()
 
         self.character_sprites = pygame.sprite.Group()
 
@@ -79,24 +80,26 @@ class Map:
     def add_characters(self, character_data):
         for data in character_data:
             screen_x = (data.x -
-                        self.player.rect.width/2) * self.map_layer.zoom
+                        self.player.rect.width/2)
             screen_y = (data.y -
-                        self.player.rect.height/2) * self.map_layer.zoom
+                        self.player.rect.height/2)
             character = OtherPlayersVisualisation(
-                screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index, self.map_layer.zoom)
+                screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index, self.map_layer.zoom, self.current_map.name)
             self.character_sprites.add(character)
+            self.all_sprites.add(character)
             self.group.add(character)
             self.characters.append(character)
 
     def move_characters(self, character_data):
         for character, data in zip(self.character_sprites, character_data):
             character.rect.x = (data.x -
-                                self.player.rect.width/2) * self.map_layer.zoom
+                                self.player.rect.width/2)
             character.rect.y = (
-                data.y - self.player.rect.height/2) * self.map_layer.zoom
+                data.y - self.player.rect.height/2)
             character.direction = data.direction
             character.index_image = data.index_image
             character.spritesheet_index = data.spritesheet_index
+            character.current_map_name = data.current_map_name
 
     def update(self) -> None:
         if self.player:
@@ -104,12 +107,35 @@ class Map:
                 self.switch_map(self.player.change_map)
                 self.player.change_map = None
         self.group.center(self.player.rect.center)
-        self.group.update()
-        # self.character_sprites.update(self.map_layer.zoom)
+        self.group.update(self.current_map.name)
+
+        # self.update_group()
         self.group.draw(self.screen.get_display())
-        # self.character_sprites.draw(self.screen.get_display())
 
     def pose_player(self, switch: Switch):
         position = self.tmx_data.get_object_by_name(
             "spawn " + self.current_map.name + " " + str(switch.port))
         self.player.position = pygame.math.Vector2(position.x, position.y)
+
+
+    def update_group(self):
+        sprites_to_add = []
+        sprites_to_remove = []
+
+        # Parcourir tous les sprites dans le groupe
+        for sprite in self.character_sprites.sprites():
+            if hasattr(sprite, 'visible'):
+                if not sprite.visible:
+                    # Ajouter le sprite à la liste des sprites à retirer
+                    sprites_to_remove.append(sprite)
+                elif sprite.visible and sprite not in self.group:
+                    # Ajouter le sprite à la liste des sprites à ajouter
+                    sprites_to_add.append(sprite)
+
+        # Retirer les sprites du groupe
+        for sprite in sprites_to_remove:
+            self.group.remove(sprite)
+
+        # Ajouter les sprites au groupe
+        for sprite in sprites_to_add:
+            self.group.add(sprite)

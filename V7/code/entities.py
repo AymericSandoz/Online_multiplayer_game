@@ -18,7 +18,7 @@ for player_data in players_start:
     x = player_data["x"]
     y = player_data["y"]
     player_instance = OtherPlayers(
-        x, y, direction="down", index_image=0, spritesheet_index="foot_red")
+        x, y, direction="down", index_image=0, spritesheet_index="foot_red", current_map_name = "map_0")
     player_instances.append(player_instance)
 
 MAX_PLAYERS = len(player_instances)
