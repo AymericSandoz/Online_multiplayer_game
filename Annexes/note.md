@@ -44,3 +44,11 @@ Le fait de mettre players a régler le soucis de l'affichage du bonhomme en haut
 
 # en y de 368 à 338 il y a un bug les autres perso ne décale
 # e x de 636 à 668
+
+
+# Roadmap au 26/11 pour la version Beta
+- Faire un menu qui permet de choisir son joeur
+- Ne faire apparaitre les joeurs que quand ils ont été créer
+- Faire 6 sprites différents(vélo et foot)
+- Refaire la map
+- Faire une barre du haut avec des infos

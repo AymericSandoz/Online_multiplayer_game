@@ -7,21 +7,27 @@ from switch import Switch
 
 
 class Player(Entity):
-    def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int):
-        super().__init__(keylistener, screen, x, y)
+    def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int, role: int, name: str):
+        super().__init__(keylistener, screen, x, y, role, name)
         self.pokedollars: int = 0
 
         self.spritesheet_bike: pygame.image = pygame.image.load(
             "./assets/sprite/hero_01_red_m_cycle_roll.png")
+        self.spritesheet_cat: pygame.image = pygame.image.load(
+            "./assets/sprite/hero_01_white_f_run.png")
 
         self.switchs: list[Switch] | None = None
         self.collisions: list[pygame.Rect] | None = None
         self.change_map: Switch | None = None
-        self.spritesheet_index = "foot_red"
+        self.role = role
+        self.name = name
+        self.spritesheet_index: str = None
+        self.init_spritesheet()
 
     def update(self, player_current_map_name) -> None:
         self.check_input()
         self.check_move()
+
         super().update()
 
     def check_move(self) -> None:
@@ -92,15 +98,21 @@ class Player(Entity):
             self.spritesheet_index = "foot_red"
         self.keylistener.remove_key(pygame.K_b)
 
+    def switch_ghost(self):
+        self.role = "ghost"
+        # self.image.set_alpha(30)
+
 
 class OtherPlayers():
-    def __init__(self, x: int, y: int, direction: str, index_image: int = 0, spritesheet_index: str = "foot_red", current_map_name: str = "map_0"):
+    def __init__(self, x: int, y: int, direction: str, index_image: int = 0, spritesheet_index: str = "foot_red", current_map_name: str = "map_0", role: str = "mouse", name: str = "basile"):
         self.x = x
         self.y = y
         self.direction = direction
         self.index_image = index_image
         self.spritesheet_index = spritesheet_index
         self.current_map_name = current_map_name
+        self.role = role
+        self.name = name
 
     def __iter__(self):
         yield self.x
@@ -108,13 +120,14 @@ class OtherPlayers():
 
 
 class OtherPlayersVisualisation(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red", map_zoom: int = 1, current_map_name: str = "map_0"):
+    def __init__(self, x: int, y: int, direction: str, index_image: int, spritesheet_index: str = "foot_red", map_zoom: int = 1, current_map_name: str = "map_0", role: str = "mouse", name: str = "basile"):
         super().__init__()
 
         self.x = x
         self.y = y
-        self.spritesheet: pygame.image = pygame.image.load(
-            "./assets/sprite/hero_01_red_m_walk.png")
+        self.role = role
+        self.name = name
+        self.init_spritesheet()
         self.direction: str = direction
         self.position = pygame.math.Vector2(x, y)
         self.spritesheet_bike: pygame.image = pygame.image.load(
@@ -140,6 +153,9 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
         self.image = self.all_images[self.direction][self.index_image]
 
         self.set_visibility(player_current_map_name)
+
+        if self.role == "ghost":
+            self.image.set_alpha(150)
         # self.kill()
 
     def get_all_images(self, spritesheet) -> dict[str, list[pygame.image]]:
@@ -159,19 +175,28 @@ class OtherPlayersVisualisation(pygame.sprite.Sprite):
                     spritesheet, i * width, j * height, 24, 32))
         return all_images
 
+    def init_spritesheet(self) -> None:
+        if self.role == "cat":
+            self.spritesheet: pygame.image = pygame.image.load(
+                "./assets/sprite/hero_01_white_f_run.png")
+        else:
+            self.spritesheet: pygame.image = pygame.image.load(
+                f"./assets/sprite/{self.name}_walk.png")
+        print(self.name)
+
     def switch_spritesheet(self):
         if self.spritesheet_index == "bike_red":
             self.all_images = self.get_all_images(self.spritesheet_bike)
-        else:
+        elif self.spritesheet_index == "cat_red":
             self.all_images = self.get_all_images(self.spritesheet)
 
-    def resize_image(self, factor):
-        print(self.rect)
-        old_rect = self.rect
-        self.image = pygame.transform.scale(
-            self.image, (24 * factor, 32 * factor))
-        self.rect = self.image.get_rect(topleft=(old_rect.topleft))
-        print(self.rect)
+    # def resize_image(self, factor):
+    #     print(self.rect)
+    #     old_rect = self.rect
+    #     self.image = pygame.transform.scale(
+    #         self.image, (24 * factor, 32 * factor))
+    #     self.rect = self.image.get_rect(topleft=(old_rect.topleft))
+    #     print(self.rect)
 
     # Add a method to toggle visibility
     def set_visibility(self, player_current_map_name):

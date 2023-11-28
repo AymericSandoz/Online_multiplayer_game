@@ -5,12 +5,13 @@ from tool import Tool
 
 
 class Entity(pygame.sprite.Sprite):
-    def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int):
+    def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int, role: int, name: int):
         super().__init__()
         self.screen: Screen = screen
         self.keylistener: KeyListener = keylistener
-        self.spritesheet: pygame.image = pygame.image.load(
-            "./assets/sprite/hero_01_red_m_walk.png")
+        self.role = role
+        self.name = name
+        self.init_spritesheet()
         self.image: pygame.image = Tool.split_image(
             self.spritesheet, 0, 0, 24, 32)
         self.position: pygame.math.Vector2 = pygame.math.Vector2(x, y)
@@ -31,12 +32,24 @@ class Entity(pygame.sprite.Sprite):
 
         self.speed: int = 1
 
+    def init_spritesheet(self) -> None:
+        if self.role == "cat":
+            self.spritesheet: pygame.image = pygame.image.load(
+                "./assets/sprite/hero_01_white_f_run.png")
+            self.spritesheet_index = "cat_red"
+        else:
+            self.spritesheet: pygame.image = pygame.image.load(
+                f"./assets/sprite/{self.name}_walk.png")
+            self.spritesheet_index = "foot_red"
+
     def update(self) -> None:
         self.animation_sprite()
         self.move()
         self.rect.center = self.position
         self.hitbox.midbottom = self.rect.midbottom
         self.image = self.all_images[self.direction][self.index_image]
+        if self.role == "ghost":
+            self.image.set_alpha(150)
 
     def move_left(self) -> None:
         self.animation_walk = True

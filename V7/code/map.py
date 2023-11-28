@@ -37,7 +37,7 @@ class Map:
             map_layer=self.map_layer, default_layer=7)
 
         if switch.name.split("_")[0] == "map":
-            self.map_layer.zoom = 1
+            self.map_layer.zoom = 2.5
         else:
             self.map_layer.zoom = 3.75
 
@@ -84,7 +84,7 @@ class Map:
             screen_y = (data.y -
                         self.player.rect.height/2)
             character = OtherPlayersVisualisation(
-                screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index, self.map_layer.zoom, self.current_map.name)
+                screen_x, screen_y,  data.direction, data.index_image, data.spritesheet_index, self.map_layer.zoom, self.current_map.name, data.role, data.name)
             self.character_sprites.add(character)
             self.all_sprites.add(character)
             self.group.add(character)
@@ -100,16 +100,21 @@ class Map:
             character.index_image = data.index_image
             character.spritesheet_index = data.spritesheet_index
             character.current_map_name = data.current_map_name
+            character.role = data.role
 
     def update(self) -> None:
         if self.player:
             if self.player.change_map and self.player.step >= 8:
                 self.switch_map(self.player.change_map)
                 self.player.change_map = None
+
+            for character in self.character_sprites.sprites():
+                if isinstance(character, OtherPlayersVisualisation):
+                    if self.player.rect.colliderect(character.rect):
+                        self.handle_encounter(character)
+
         self.group.center(self.player.rect.center)
         self.group.update(self.current_map.name)
-
-        # self.update_group()
         self.group.draw(self.screen.get_display())
 
     def pose_player(self, switch: Switch):
@@ -117,25 +122,7 @@ class Map:
             "spawn " + self.current_map.name + " " + str(switch.port))
         self.player.position = pygame.math.Vector2(position.x, position.y)
 
+    def handle_encounter(self, other_player: OtherPlayersVisualisation) -> None:
 
-    def update_group(self):
-        sprites_to_add = []
-        sprites_to_remove = []
-
-        # Parcourir tous les sprites dans le groupe
-        for sprite in self.character_sprites.sprites():
-            if hasattr(sprite, 'visible'):
-                if not sprite.visible:
-                    # Ajouter le sprite à la liste des sprites à retirer
-                    sprites_to_remove.append(sprite)
-                elif sprite.visible and sprite not in self.group:
-                    # Ajouter le sprite à la liste des sprites à ajouter
-                    sprites_to_add.append(sprite)
-
-        # Retirer les sprites du groupe
-        for sprite in sprites_to_remove:
-            self.group.remove(sprite)
-
-        # Ajouter les sprites au groupe
-        for sprite in sprites_to_add:
-            self.group.add(sprite)
+        if other_player.role == "cat" and self.player.role == "mouse":
+            self.player.switch_ghost()
