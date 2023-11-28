@@ -3,7 +3,7 @@ import pygame
 from tool import Tool
 
 players_start = [
-    {"x": 380, "y": 640, "role": "cat", "name": "aymeric"},
+    {"x": 380, "y": 640, "role": "cat", "name": "louis"},
     {"x": 400, "y": 500, "role": "mouse", "name": "luc"},
     {"x": 450, "y": 300, "role": "mouse", "name": "jerome"},
     {"x": 400, "y": 350, "role": "mouse", "name": "shlops"},
