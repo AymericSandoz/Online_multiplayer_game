@@ -1,7 +1,7 @@
 import pygame
 import pyscroll
 import pytmx
-
+from tool import Tool
 from player import Player, OtherPlayers, OtherPlayersVisualisation
 from screen import Screen
 from switch import Switch
@@ -26,6 +26,8 @@ class Map:
             "switch", "map_0", pygame.Rect(0, 0, 0, 0), 0)
 
         self.switch_map(self.current_map)
+        self.images = {}
+        self.cross_image = pygame.transform.scale(pygame.image.load("./assets/sprite/red_cross.png"), (24 * 2, 32 * 2))
 
     def switch_map(self, switch: Switch) -> None:
         self.tmx_data = pytmx.load_pygame(
@@ -89,6 +91,14 @@ class Map:
             self.all_sprites.add(character)
             self.group.add(character)
             self.characters.append(character)
+            self.add_characters_image()
+
+    def add_characters_image(self):
+        for player in self.characters:
+            image = pygame.image.load(f"./assets/sprite/{player.name}_walk.png")
+            image = Tool.split_image(image, 0, 0, 24, 32)
+            image = pygame.transform.scale(image, (24 * 2, 32 * 2))
+            self.images[player.name] = image
 
     def move_characters(self, character_data):
         for character, data in zip(self.character_sprites, character_data):
@@ -116,6 +126,7 @@ class Map:
         self.group.center(self.player.rect.center)
         self.group.update(self.current_map.name)
         self.group.draw(self.screen.get_display())
+        self.draw_header()
 
     def pose_player(self, switch: Switch):
         position = self.tmx_data.get_object_by_name(
@@ -126,3 +137,11 @@ class Map:
 
         if other_player.role == "cat" and self.player.role == "mouse":
             self.player.switch_ghost()
+
+    def draw_header(self):
+        for i, player in enumerate(self.characters):
+            image = self.images[player.name]
+            self.screen.get_display().blit(image, (20, 20 + i * 100))
+            if player.role == "ghost":
+                # image.set_alpha(70)
+                self.screen.get_display().blit(self.cross_image, (20, 20 + i * 100))
