@@ -1,49 +1,36 @@
-class Character:
-    def __init__(self):
-        # Utilisation d'un dictionnaire pour simuler character.rect
-        self.rect = {'x': 100, 'y': 100}
+from PIL import Image
+import os
 
+def decouper_image():
+    # Obtenez le chemin complet vers le fichier image dans le dossier de téléchargement
+    chemin_image = os.path.join(os.path.expanduser("~"), "Downloads", "animals_sprites.png")
 
-# Initialisation des paramètres
-screen_width = 1280
-screen_height = 720
-map_width = 2048
-map_height = 736
+    # Vérifier si le fichier existe
+    if not os.path.exists(chemin_image):
+        print(f"Erreur : Le fichier {chemin_image} n'a pas été trouvé.")
+        return
 
-# Position initiale du joueur
-x = 100
-y = 100
+    # Charger l'image avec Pillow
+    image = Image.open(chemin_image)
 
-# Initialisation de la caméra
-camera_x = x - (screen_width / 2)
-camera_y = y - (screen_height / 2)
+    # Convertir l'image en mode RGB (en supprimant le canal alpha)
+    image = image.convert("RGB")
 
-# Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
-camera_x = max(0, min(camera_x, map_width - screen_width))
-camera_y = max(0, min(camera_y, map_height - screen_height))
+    # Obtenir les dimensions originales de l'image
+    largeur, hauteur = image.size
 
-# Création d'un personnage
-character = Character()
+    # Calculer les nouvelles dimensions pour découper l'image
+    nouvelle_largeur = largeur // 4  # 1/3 de la largeur
+    nouvelle_hauteur = hauteur // 2  # 1/2 de la hauteur
 
-# Simulation d'une évolution de x et y
-for step in range(50):
-    x += 16  # Augmentez x pour simuler le mouvement du joueur
-    y += 0  # Augmentez y pour simuler le mouvement du joueur
+    # Découper l'image
+    nouvelle_image = image.crop((0, 0, nouvelle_largeur, nouvelle_hauteur))
 
-    # Mise à jour de la caméra
-    camera_x = x - (screen_width / 2)
-    camera_y = y - (screen_height / 2)
+    # Enregistrer l'image découpée en tant que fichier JPEG
+    nouvelle_image.save("image_decoupee.jpg")
 
-    # Limitez les coordonnées de la caméra pour qu'elles restent dans les limites de la carte
-    camera_x = max(0, min(camera_x, map_width - screen_width))
-    camera_y = max(0, min(camera_y, map_height - screen_height))
+    # Afficher l'image découpée
+    nouvelle_image.show()
 
-    # Mise à jour des positions du personnage en fonction de la caméra
-    # Utilisation de valeurs de zoom arbitraires
-    character.rect['x'] = (x - camera_x - 20 / 2) * 2
-    # Utilisation de valeurs de zoom arbitraires
-    character.rect['y'] = (y - camera_y - 20 / 2) * 2
-
-    # Affichage des résultats
-    print(
-        f"Step {x}: Character - X: {character.rect['x']}, Y: {character.rect['y']}")
+# Exemple d'utilisation
+decouper_image()

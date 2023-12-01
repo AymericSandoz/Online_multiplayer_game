@@ -12,6 +12,7 @@ class Entity(pygame.sprite.Sprite):
         self.role = role
         self.name = name
         self.init_spritesheet()
+        print(self.spritesheet.get_size())
         self.image: pygame.image = Tool.split_image(
             self.spritesheet, 0, 0, 24, 32)
         self.position: pygame.math.Vector2 = pygame.math.Vector2(x, y)

@@ -22,6 +22,7 @@ class Player(Entity):
         self.role = role
         self.name = name
         self.spritesheet_index: str = None
+        self.joined = True
         self.init_spritesheet()
 
     def update(self, player_current_map_name) -> None:

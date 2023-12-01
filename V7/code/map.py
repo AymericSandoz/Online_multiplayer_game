@@ -23,11 +23,12 @@ class Map:
         self.character_sprites = pygame.sprite.Group()
 
         self.current_map: Switch = Switch(
-            "switch", "map_0", pygame.Rect(0, 0, 0, 0), 0)
+            "switch", "house_0", pygame.Rect(0, 0, 0, 0), 0)
 
         self.switch_map(self.current_map)
         self.images = {}
-        self.cross_image = pygame.transform.scale(pygame.image.load("./assets/sprite/red_cross.png"), (24 * 2, 32 * 2))
+        self.cross_image = pygame.transform.scale(pygame.image.load(
+            "./assets/sprite/red_cross.png"), (24 * 2, 32 * 2))
 
     def switch_map(self, switch: Switch) -> None:
         self.tmx_data = pytmx.load_pygame(
@@ -95,7 +96,8 @@ class Map:
 
     def add_characters_image(self):
         for player in self.characters:
-            image = pygame.image.load(f"./assets/sprite/{player.name}_walk.png")
+            image = pygame.image.load(
+                f"./assets/sprite/{player.name}_walk.png")
             image = Tool.split_image(image, 0, 0, 24, 32)
             image = pygame.transform.scale(image, (24 * 2, 32 * 2))
             self.images[player.name] = image
@@ -112,16 +114,17 @@ class Map:
             character.current_map_name = data.current_map_name
             character.role = data.role
 
-    def update(self) -> None:
+    def update(self, switch_map_blocked = False, game_start = False) -> None:
         if self.player:
-            if self.player.change_map and self.player.step >= 8:
-                self.switch_map(self.player.change_map)
-                self.player.change_map = None
+            if switch_map_blocked == False and self.player.change_map and self.player.step >= 8:
+               self.switch_map(self.player.change_map)
+               self.player.change_map = None
 
-            for character in self.character_sprites.sprites():
-                if isinstance(character, OtherPlayersVisualisation):
-                    if self.player.rect.colliderect(character.rect):
-                        self.handle_encounter(character)
+            if game_start:
+                for character in self.character_sprites.sprites():
+                    if isinstance(character, OtherPlayersVisualisation):
+                        if self.player.rect.colliderect(character.rect):
+                            self.handle_encounter(character)
 
         self.group.center(self.player.rect.center)
         self.group.update(self.current_map.name)
